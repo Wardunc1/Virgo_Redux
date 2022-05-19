@@ -59,11 +59,16 @@ yes    yes  yes yes yes
         await msg.channel.send(content = content, file = img)
 
     @commands.command()
-    async def oof(sels, msg):
-        img = discord.File('assets/oof-scared.gif')
+    async def oof(self, msg):
+        img = discord.File('assets/oof.jpg')
 
         await msg.channel.send(file = img)
 
+    @commands.command()
+    async def mmmm(self,msg):
+        img = discord.File('assets/oof-scared.gif')
+
+        await msg.channel.send(file = img)
 
 
     @commands.command()
