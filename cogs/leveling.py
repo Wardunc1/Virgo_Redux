@@ -77,8 +77,9 @@ class Leveling(commands.Cog):
     @commands.command(name='stats')
     async def check_level(self, msg):
         user = msg.author
+        guild = user.guild
         
-        with open('data/levels.json','r') as file_data:
+        with open(f'data/levels{guild.id}.json','r') as file_data:
             file = json.load(file_data)
             for u in file['user']:
                 if str(user.id) == u['id']:
