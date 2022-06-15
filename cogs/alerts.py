@@ -1,4 +1,3 @@
-from ssl import CHANNEL_BINDING_TYPES
 import time
 import discord 
 from discord.ext import tasks
@@ -23,6 +22,7 @@ class Alerts(commands.Cog):
     #Change Loop time
     @commands.command()
     async def change_loop(self,ctx):#12 char
+        '''!change_loop h m s \n \nChanges the interval between water messages  \nRemember to use spaces!'''
         message = ctx.message
         channel = ctx.channel
 
