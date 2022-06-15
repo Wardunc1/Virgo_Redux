@@ -1,3 +1,4 @@
+from ssl import CHANNEL_BINDING_TYPES
 import time
 import discord 
 from discord.ext import tasks
@@ -10,14 +11,34 @@ class Alerts(commands.Cog):
         self.water.start()
 
     @commands.command()
-    async def stop_water(self):
+    async def stop_water(self, ctx):
         self.water.stop()
-    
+        await ctx.channel.send('Water stopped')
+
     @commands.command()
-    async def start_water(self):
+    async def start_water(self, ctx):
         self.water.start()
+        await ctx.channel.send('Here comes the rain!')
+    
+    #Change Loop time
+    @commands.command()
+    async def change_loop(self,ctx):#12 char
+        message = ctx.message
+        channel = ctx.channel
+
+        message = message.content[12:]
+        if message != '':
+            msgsplit = message.split()
+            hour=int(msgsplit[0])
+            minute=int(msgsplit[1])
+            sec=int(msgsplit[2])
+            self.water.change_interval(hours=hour, minutes=minute, seconds=sec)
+            await channel.send(f'Interval changed to {hour} hours, {minute} minutes, and {sec} seconds')
+        else:
+            await channel.send('Enter hour min sec')
+
         
-    @tasks.loop(hours =1, minutes = 21, seconds = 54)
+    @tasks.loop(seconds = 54)
     async def water(self):
         now = time.localtime()
         if now.tm_hour > 23:
