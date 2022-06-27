@@ -11,14 +11,14 @@ class Leveling(commands.Cog):
         for guild in self.guilds:
             #check for level file
             try:
-                ldb = open(f'data/levels{guild.id}.json', 'r+')
+                ldb = open(f'data/{guild.id}/levels.json', 'r+')
 
                 if ldb != None:
                     print('Level Data Found!')
 
             except:
                 print('Creating Level data!')
-                with open(f'data/levels{guild.id}.json','w') as file:
+                with open(f'data/{guild.id}/levels.json','w') as file:
                     jstring = {
 
                     "user": [
@@ -41,7 +41,7 @@ class Leveling(commands.Cog):
         guild = message.guild
 
     
-        with open(f'data/levels{guild.id}.json', 'r') as d:
+        with open(f'data/{guild.id}/levels.json', 'r') as d:
             users = json.load(d)
             print('doc opened')
             counter = 0
@@ -55,7 +55,7 @@ class Leveling(commands.Cog):
                         embed = discord.Embed(title=f'{user.display_name} has leveled up to {level}!!')
                         await message.channel.send(f'{user.mention}', embed=embed)
                     u['xp'] = str(xp)
-                    with open(f'data/levels{guild.id}.json', 'w') as file:
+                    with open(f'data/{guild.id}/levels.json', 'w') as file:
                         json.dump(users,file,indent=4)
                         print(f'{u} found!')
                         break
@@ -67,7 +67,7 @@ class Leveling(commands.Cog):
                     'xp' : '{}'.format(str(5)),
                     'level':'{}'.format(str(1))
                     }
-                    with open(f'data/levels{guild.id}.json', 'w') as file:
+                    with open(f'data/{guild.id}/levels.json', 'w') as file:
                         users['user'].append(json_string)
                         d.seek(0)
                         json.dump(users, file, indent=4)
@@ -79,7 +79,7 @@ class Leveling(commands.Cog):
         user = msg.author
         guild = user.guild
         
-        with open(f'data/levels{guild.id}.json','r') as file_data:
+        with open(f'data/{guild.id}/levels.json','r') as file_data:
             file = json.load(file_data)
             for u in file['user']:
                 if str(user.id) == u['id']:
