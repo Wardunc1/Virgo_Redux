@@ -1,4 +1,3 @@
-from operator import contains
 import os
 import time
 import json
@@ -10,6 +9,24 @@ class Economy(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.guilds = bot.guilds
+        self.suits = ['D','S','C','H']
+        self.cards = [ 'A','2','3','4','5','6','7','8','9','10','J','Q','K']
+        self.unicode = [b'\u1f0b1',b'\u1f0b2',b'\u1f0b3',b'\u1f0b4',
+                        b'\u1f0b5',b'\u1f0b6',b'\u1f0b7',b'\u1f0b8',
+                        b'\u1f0b9',b'\u1f0ba',b'\u1f0bb',b'\u1f0bd',
+                        b'\u1f0be',b'\u1f0a1',b'\u1f0a2',b'\u1f0a3',
+                        b'\u1f0a5',b'\u1f0a6',b'\u1f0a7',b'\u1f0a8',
+                        b'\u1f0a9',b'\u1f0aa',b'\u1f0ab',b'\u1f0ad',
+                        b'\u1f0ae',b'\u1f0a4',b'\u1f0c1',b'\u1f0c2',
+                        b'\u1f0c3',b'\u1f0c4',b'\u1f0c5',b'\u1f0c6',
+                        b'\u1f0c7',b'\u1f0c8',b'\u1f0c9',b'\u1f0ca',
+                        b'\u1f0cb',b'\u1f0cd',b'\u1f0ce',b'\u1f0d1',
+                        b'\u1f0d2',b'\u1f0d3',b'\u1f0d4',b'\u1f0de',
+                        b'\u1f0d5',b'\u1f0d6',b'\u1f0d7',b'\u1f0d8',
+                        b'\u1f0d9',b'\u1f0da',b'\u1f0db',b'\u1f0dd',
+                        ]
+
+
 
         for guild in self.guilds:
             
@@ -75,9 +92,12 @@ class Economy(commands.Cog):
                             u['lastwork'] = lastwork
                             u['coins'] = coins
                             json.dump(users, file, indent=5)
+                            d.seek(0)
+                            file.seek(0)
                             await channel.send(f'{user.mention} worked {job} and made {wage} coins!')
 
                     elif int(now) <= int(u['lastwork'])+86400:
+                        d.seek(0)
                         await channel.send(f'{user.mention}, You can only work once every 24 hours')
 
                 elif counter == len(users['user']):
@@ -94,6 +114,7 @@ class Economy(commands.Cog):
                         d.seek(0)
                         json.dump(users, file, indent=5)
                         print('user added')
+                        file.seek(0)
                         await channel.send(f'{user.mention} worked {job} and made 150 coins!')
                     
 
@@ -105,12 +126,14 @@ class Economy(commands.Cog):
         guild = ctx.guild
         if arg == ():
             with open(f'data/{guild.id}/economy.json', 'r') as f:
+                f.seek(0)
                 users = json.load(f)
                 for u in users['user']:
                     if str(user.id) == u['id']:
                         coins = u['coins']
                         lastwork = time.localtime(int(u['lastwork']))
                         await channel.send(f'{user.mention},You currently have {coins} coins and last worked {time.asctime(lastwork)}')
+                f.seek(0)
                         
 
 
@@ -122,6 +145,7 @@ class Economy(commands.Cog):
         else:
             #Find user and print wallet
             with open(f'data/{guild.id}/economy.json', 'r') as file:
+                file.seek(0)
                 users = json.load(file)
 
                 for u in users['user']:
@@ -133,10 +157,39 @@ class Economy(commands.Cog):
 
                         print('user found')
                     else:
-                        await channel.send('User not found.')       
+                        await channel.send('User not found.')  
+                file.seek(0)     
+    
+    
+    @commands.command()
+    @commands.has_role('Developer')
+    async def blackjack(self, ctx, arg):
+        bet = arg
+        user = ctx.author
+        channel = ctx.channel
+        _user_id = user.id
 
-    def blackjack():
-        pass
+        userc1 = random.choice(self.suits) + random.choice(self.cards)
+        userc2 = random.choice(self.suits) + random.choice(self.cards)
+        
+        embed = discord.Embed(title='Black Jack')
+        embed.add_field(name='Your Cards',
+                        value=f'{userc1} , {userc2}',
+                        inline=True)
+
+        embed.add_field(name='_________________',
+                        value='!hit to hit \n !stay to stay',
+                        inline=False)
+
+        dealerc1 = random.choice(self.suits) + random.choice(self.cards)
+        dealerc2 = random.choice(self.suits) + random.choice(self.cards)
+
+
+
+        await channel.send(embed= embed)
+        
+
+        
 
     def roulett():
         pass
