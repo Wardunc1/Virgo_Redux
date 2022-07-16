@@ -82,8 +82,6 @@ class Economy(commands.Cog):
             print('doc opened')
             counter = 0
             for u in users['user']:
-                counter+= 1
-                
                 if str(user.id) == u['id']:  
                     if int(now) >= int(u['lastwork'])+86400:
                         lastwork = now
@@ -95,10 +93,12 @@ class Economy(commands.Cog):
                             d.seek(0)
                             file.seek(0)
                             await channel.send(f'{user.mention} worked {job} and made {wage} coins!')
+                            break
 
                     elif int(now) <= int(u['lastwork'])+86400:
                         d.seek(0)
                         await channel.send(f'{user.mention}, You can only work once every 24 hours')
+                        break
 
                 elif counter == len(users['user']):
                     jstring = {
@@ -116,6 +116,7 @@ class Economy(commands.Cog):
                         print('user added')
                         file.seek(0)
                         await channel.send(f'{user.mention} worked {job} and made 150 coins!')
+                counter+= 1
                     
 
     @commands.command()
@@ -133,7 +134,8 @@ class Economy(commands.Cog):
                         coins = u['coins']
                         lastwork = time.localtime(int(u['lastwork']))
                         await channel.send(f'{user.mention},You currently have {coins} coins and last worked {time.asctime(lastwork)}')
-                f.seek(0)
+                    f.seek(0)
+                    
                         
 
 
