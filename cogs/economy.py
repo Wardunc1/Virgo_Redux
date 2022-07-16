@@ -92,9 +92,12 @@ class Economy(commands.Cog):
                             u['lastwork'] = lastwork
                             u['coins'] = coins
                             json.dump(users, file, indent=5)
+                            d.seek(0)
+                            file.seek(0)
                             await channel.send(f'{user.mention} worked {job} and made {wage} coins!')
 
                     elif int(now) <= int(u['lastwork'])+86400:
+                        d.seek(0)
                         await channel.send(f'{user.mention}, You can only work once every 24 hours')
 
                 elif counter == len(users['user']):
@@ -111,6 +114,7 @@ class Economy(commands.Cog):
                         d.seek(0)
                         json.dump(users, file, indent=5)
                         print('user added')
+                        file.seek(0)
                         await channel.send(f'{user.mention} worked {job} and made 150 coins!')
                     
 
@@ -122,6 +126,7 @@ class Economy(commands.Cog):
         guild = ctx.guild
         if arg == ():
             with open(f'data/{guild.id}/economy.json', 'r') as f:
+                f.seek(0)
                 users = json.load(f)
                 for u in users['user']:
                     if str(user.id) == u['id']:
@@ -140,6 +145,7 @@ class Economy(commands.Cog):
         else:
             #Find user and print wallet
             with open(f'data/{guild.id}/economy.json', 'r') as file:
+                file.seek(0)
                 users = json.load(file)
 
                 for u in users['user']:
@@ -152,7 +158,7 @@ class Economy(commands.Cog):
                         print('user found')
                     else:
                         await channel.send('User not found.')  
-            file.seek(0)     
+                file.seek(0)     
     
     
     @commands.command()
@@ -178,7 +184,7 @@ class Economy(commands.Cog):
         dealerc1 = random.choice(self.suits) + random.choice(self.cards)
         dealerc2 = random.choice(self.suits) + random.choice(self.cards)
 
-        
+
 
         await channel.send(embed= embed)
         
