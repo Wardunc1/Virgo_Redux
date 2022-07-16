@@ -13,7 +13,7 @@ class Alerts(commands.Cog):
 
     @commands.command()
     async def change_start(self,ctx, arg):
-        '''Changes the time that the bot starts sending alerts || !change_start Hr'''
+        '''Changes the time that the bot starts sending alerts \n !change_start Hr'''
         if arg != None:
             if int(arg) < self.endtime:
                 self.starttime = int(arg)
@@ -29,7 +29,7 @@ class Alerts(commands.Cog):
     
     @commands.command()
     async def change_end(self,ctx,arg):
-        '''Changes the time that the bot stops sending alerts || !change_end Hr'''
+        '''Changes the time that the bot stops sending alerts \n !change_end Hr'''
         if arg != None:
             if int(arg) < int(self.starttime):
                 self.endtime = int(arg)
