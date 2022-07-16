@@ -10,7 +10,7 @@ class Chat_commands(commands.Cog):
         user = msg.author
 
         print(f'{user} has used the hello command')
-        hello_msg = f"Hello! {user.mention}! My name is Virgo, I am a utility bot specialy made for The Vibe Checkers. I am currently in development so if you notice any bugs or glitches please report them to <@!241296650650255372>"
+        hello_msg = f"Hello! {user.mention}! My name is Virgo, I am a utility bot specialy made for The Vibe Checkers. I am currently in development so if you notice any bugs or glitches please report them to <@!241296650650255372> or at https://github.com/Wardunc1/Virgo_Redux/issues"
         await msg.channel.send(hello_msg)
     
     @commands.command()
