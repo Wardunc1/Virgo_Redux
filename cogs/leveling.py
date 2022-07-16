@@ -56,6 +56,7 @@ class Leveling(commands.Cog):
                         await message.channel.send(f'{user.mention}', embed=embed)
                     u['xp'] = str(xp)
                     with open(f'data/{guild.id}/levels.json', 'w') as file:
+                        d.seek(0)
                         json.dump(users,file,indent=4)
                         print(f'{u} found!')
                         break
