@@ -31,11 +31,11 @@ class Alerts(commands.Cog):
     async def change_end(self,ctx,arg):
         '''Changes the time that the bot stops sending alerts \n !change_end Hr'''
         if arg != None:
-            if int(arg) < int(self.starttime):
+            if int(arg) > int(self.starttime):
                 self.endtime = int(arg)
                 await ctx.channel.send(f'End time changed to {self.endtime}:00')
             
-            elif int(arg) >= int(self.starttime):
+            elif int(arg) <= int(self.starttime):
                 await ctx.channel.send(f'End time must be after start time {self.starttime}:00')
         else:
             await ctx.channel.send('Please enter the hour you would like alerts to stop')
