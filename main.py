@@ -30,7 +30,7 @@ class Virgo_Bot(commands.Bot):
                 except Exception as e:
                     print(f'There was an error loading {cog[:-3]} \n {e}')
         
-        await self.change_presence(activity=discord.Game(name='Im here to help !help'))
+        await self.change_presence(activity=discord.Game(name='Mikey is my pappi !help'))
         print(f"{self.user} is ready for use!")    
 
 
