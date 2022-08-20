@@ -12,20 +12,6 @@ class Economy(commands.Cog):
         self.guilds = bot.guilds
         self.suits = ['D','S','C','H']
         self.cards = [ 'A','2','3','4','5','6','7','8','9','10','J','Q','K']
-        self.unicode = [b'\u1f0b1',b'\u1f0b2',b'\u1f0b3',b'\u1f0b4',
-                        b'\u1f0b5',b'\u1f0b6',b'\u1f0b7',b'\u1f0b8',
-                        b'\u1f0b9',b'\u1f0ba',b'\u1f0bb',b'\u1f0bd',
-                        b'\u1f0be',b'\u1f0a1',b'\u1f0a2',b'\u1f0a3',
-                        b'\u1f0a5',b'\u1f0a6',b'\u1f0a7',b'\u1f0a8',
-                        b'\u1f0a9',b'\u1f0aa',b'\u1f0ab',b'\u1f0ad',
-                        b'\u1f0ae',b'\u1f0a4',b'\u1f0c1',b'\u1f0c2',
-                        b'\u1f0c3',b'\u1f0c4',b'\u1f0c5',b'\u1f0c6',
-                        b'\u1f0c7',b'\u1f0c8',b'\u1f0c9',b'\u1f0ca',
-                        b'\u1f0cb',b'\u1f0cd',b'\u1f0ce',b'\u1f0d1',
-                        b'\u1f0d2',b'\u1f0d3',b'\u1f0d4',b'\u1f0de',
-                        b'\u1f0d5',b'\u1f0d6',b'\u1f0d7',b'\u1f0d8',
-                        b'\u1f0d9',b'\u1f0da',b'\u1f0db',b'\u1f0dd',
-                        ]
 
 
 
@@ -164,400 +150,222 @@ class Economy(commands.Cog):
                 file.seek(0)     
     
     
-    @commands.command()
-    async def blackjack(self, ctx, arg):
-        bet = arg
-        user = ctx.author
-        channel = ctx.channel
-        guild = ctx.guild
-        _user_id = user.id
-
-
-        def value(*cards):
-            total = 0
-            counter = 1
-            for card in cards:
-                suit = card[0]
-                nmb = card[1]
-                if nmb in ['J','Q','K']:
-                    total += 10
-                
-                elif nmb == 'A':
-                    if counter > 2 and total <= 10 and len(cards) == 2:
-                        total += 11
-                    
-                    elif counter == 1 and len(cards) == 2:
-                        total+=  11
-                        
-                    else:
-                        total += 1
-                
-                elif nmb in [str(x) for x in range(2,10)]:
-                    total += int(nmb)
-                counter += 1
+    def value(self, cards:list):
+        total = 0
+        counter = 1
+        for card in cards:
+            suit = card[0]
+            nmb = card[1:]
+            if nmb in ['J','Q','K']:
+                total += 10
             
-            return total
-
-        
-        bet = int(bet)
-        with open(f'data/{guild.id}/economy.json', 'r') as file:
-            users = json.load(file)
-            for user in users['user']:
-                if str(user['id']) == _user_id:
-                    usercoins = user['coins']
-                    if usercoins > bet:
-                        await channel.send(f'Please place a bet that is lower than your current balance. \n Your Balance: {usercoins}')
-
-
-        # First Deal to User
-        userc1 = random.choice(self.suits) + random.choice(self.cards)
-        userc2 = random.choice(self.suits) + random.choice(self.cards)
-        
-        embed = discord.Embed(title='Black Jack')
-        embed.add_field(name='Your Cards',
-                        value=f'{userc1} , {userc2}',
-                        inline=False)
-
-        embed.add_field(name='_',
-                        value='hit or stay?',
-                        inline=False)
-
-        await channel.send(embed= embed)
-
-        #Dealer Play
-        dealerc1 = random.choice(self.suits) + random.choice(self.cards)
-        dealerc2 = random.choice(self.suits) + random.choice(self.cards)
-
-        dealtotal = value(dealerc1, dealerc2)
-        
-        if dealtotal < 17:
-            dealerc3 = random.choice(self.suits) + random.choice(self.cards)
-            dealtotal = value(dealerc2, dealerc2, dealerc3)
-            if dealtotal < 17:
-                dealerc4 = random.choice(self.suits) + random.choice(self.cards)
-                dealtotal =value(dealerc1, dealerc2, dealerc3, dealerc4)
-                dealcards = [dealerc1, dealerc2, dealerc3, dealerc4]
-            elif dealtotal > 17:
-                dealcards = [dealerc2, dealerc2, dealerc3]
-        elif dealtotal >= 17:
-            dealcards = [dealerc1, dealerc2]
-
-
-        #First user Choice
-
-        def check(msg):
-            return msg.author.id == _user_id and msg.channel == channel and msg.content.lower() in ['hit','stay']
-
-        try:
-            choice = await self.bot.wait_for('message',check=check, timeout= 60.0)
-        
-        except TimeoutError:
-            await channel.send('Command Timed Out')
-        
-        else:
-
-
-            if choice.content.lower() == 'hit':
-                userc3 = random.choice(self.suits) + random.choice(self.cards)
-                total = value(userc1, userc2, userc3)
-                if total > 21:
-                    embed.set_field_at(index=0,
-                                       name='Your Cards',
-                                       value=f'{userc1} , {userc2} , {userc3}',
-                                       inline=False)
-                    embed.insert_field_at(index=0,
-                                       name='Bust!',
-                                       value=f'Your total is {total}',
-                                       inline=False)
-                    await channel.send(embed=embed)
-
-
-
-                else:
-                    embed.set_field_at(index=0,
-                                       name='Your Cards',
-                                       value=f'{userc1} , {userc2} , {userc3}',
-                                       inline=False)
-                    await channel.send(embed=embed)
-
-
-#_______    _______________________________________________________________
-#   
-                    # User Second Responce
-                    try:
-                        choice2 =  await self.bot.wait_for('message',check=check)
-                    
-                    except TimeoutError:
-                        await channel.send('Command Timed Out')
-        
-                    else:
-                        if choice2.content.lower() == 'hit':
-                            userc4 = random.choice(self.suits) + random.choice(self.cards)
-                            total = value(userc1, userc2, userc3, userc4)
-                            if total > 21:
-                                embed.set_field_at(index=0,
-                                                   name='Your Cards',
-                                                   value=f'{userc1} , {userc2} , {userc3} , {userc4}',
-                                                   inline=False)
-                                embed.insert_field_at(index=0,
-                                                   name='Bust!',
-                                                   value=f'Your total is {total}',
-                                                   inline=False)
-                                await channel.send(embed=embed)
-
-
-
-                            else:
-                                embed.set_field_at(index=0,
-                                                   name='Your Cards',
-                                                   value=f'{userc1} , {userc2} , {userc3}, {userc4}',
-                                                   inline=False)
-                                await channel.send(embed=embed)
-            #user choice 3
-                                try:
-                                    choice3 =  await self.bot.wait_for('message',check=check)
-                                except TimeoutError:
-                                    await channel.send('Command Timed Out')
-        
-                                else:
-
-                                    if choice3.content.lower() == 'hit':
-                                        userc5 = random.choice(self.suits) + random.choice(self.cards)
-                                        total = value(userc1, userc2, userc3, userc4)
-                                        if total > 21:
-                                            embed.set_field_at(index=0,
-                                                               name='Your Cards',
-                                                               value=f'{userc1} , {userc2} , {userc3} , {userc4} , {userc5}',
-                                                               inline=False)
-                                            embed.insert_field_at(index=0,
-                                                               name='Bust!',
-                                                               value=f'Your total is {total}',
-                                                               inline=False)
-                                            await channel.send(embed=embed)
-
-
-
-                                        else:
-                                            embed.set_field_at(index=0,
-                                                               name='Your Cards',
-                                                               value=f'{userc1} , {userc2} , {userc3} , {userc4} , {userc5}',
-                                                               inline=False)
-                                            embed.remove_field(1)
-                                            usertotal = value(userc1,userc2,userc3,userc4,userc5)
-                                            dealcardlen = len(dealcards)
-
-                                            if dealcardlen == 2:
-                                                embed.add_field(name='Dealer Cards',
-                                                            value=f'{dealerc1} , {dealerc2}',
-                                                            inline=False   
-                                                            )
-                                            elif dealcardlen == 3:
-                                                embed.add_field(name='Dealer Cards',
-                                                            value=f'{dealerc1} , {dealerc2} . {dealerc2}' ,  
-                                                            inline=False
-                                                            )
-                                            elif dealcardlen == 4:
-                                                embed.add_field(name='Dealer Cards',
-                                                            value=f'{dealerc1} , {dealerc2} , {dealerc3} , {dealerc4}' ,
-                                                            inline=False 
-                                                            )
-                                            else:
-                                                print('Dealer card else')
-
-                                            if usertotal > dealtotal:
-                                                bet = bet + bet
-                                                embed.insert_field_at(  index=1,
-                                                                name='You win!',
-                                                                value=f'Your bet back Plus 1x',
-                                                                inline=False
-                                                                )
-
-                                            elif usertotal == dealtotal:
-                                            
-                                                embed.insert_field_at(  index=1,
-                                                                        name='Push',
-                                                                        value=f'You get your bet back',
-                                                                        inline=False
-                                                                        )
-
-
-                                            elif dealtotal > usertotal:
-                                                embed.insert_field_at(  index=1,
-                                                                        name='Dealer Wins!',
-                                                                        value=f'You loose your money',
-                                                                        inline=False
-                                                                        )
-
-
-
-                                            await channel.send(embed=embed)
-
-
-                                    elif choice3.content.lower() == 'stay':
-                                        usertotal = value(userc1,userc2,userc3,userc4)
-                                        embed.remove_field(1)
-                                        dealcardlen = len(dealcards)
-
-                                        if dealcardlen == 2:
-                                            embed.add_field(name='Dealer Cards',
-                                                        value=f'{dealerc1} , {dealerc2}' ,
-                                                        inline=False  
-                                                        )
-                                        elif dealcardlen == 3:
-                                            embed.add_field(name='Dealer Cards',
-                                                        value=f'{dealerc1} , {dealerc2} , {dealerc2}' ,
-                                                        inline=False  
-                                                        )
-                                        elif dealcardlen == 4:
-                                            embed.add_field(name='Dealer Cards',
-                                                        value=f'{dealerc1} , {dealerc2} , {dealerc3} , {dealerc4}' ,
-                                                        inline=False  
-                                                        )
-                                        else:
-                                            print('Dealer card else')
-
-
-                                        if usertotal > dealtotal:
-                                            bet = bet + bet
-                                            embed.insert_field_at(  index=1,
-                                                            name='You win!',
-                                                            value=f'Your bet back Plus 1x',
-                                                            inline=False
-                                                            )
-
-                                        elif usertotal == dealtotal:
-                                        
-                                            embed.insert_field_at(  index=1,
-                                                                    name='Push',
-                                                                    value=f'You get your bet back',
-                                                                    inline=False
-                                                                    )
-
-
-                                        elif dealtotal > usertotal:
-                                            embed.insert_field_at(  index=1,
-                                                                    name='Dealer Wins!',
-                                                                    value=f'You loose your money',
-                                                                    inline=False
-                                                                    )
-
-                                        await channel.send(embed=embed)
-
-                        #User Stay
-                        elif choice2.content.lower() == 'stay':
-                            usertotal = value(userc1,userc2,userc3)
-                            embed.remove_field(1)
-                            dealcardlen = len(dealcards)
-
-                            if dealcardlen == 2:
-                                embed.add_field(name='Dealer Cards',
-                                            value=f'{dealerc1} , {dealerc2}',
-                                            inline=False   
-                                            )
-                            elif dealcardlen == 3:
-                                embed.add_field(name='Dealer Cards',
-                                            value=f'{dealerc1} , {dealerc2} , {dealerc2}',
-                                            inline=False    
-                                            )
-                            elif dealcardlen == 4:
-                                embed.add_field(name='Dealer Cards',
-                                            value=f'{dealerc1} , {dealerc2} , {dealerc3} , {dealerc4}' ,
-                                            inline=False   
-                                            )
-                            else:
-                                print('Dealer card else')
-
-
-
-                            if usertotal > dealtotal:
-                                bet = bet + bet
-                                embed.add_field(
-                                                name='You win!',
-                                                value=f'Your bet back Plus 1x',
-                                                inline=False)
-                                
-
-                            elif usertotal == dealtotal:
-
-                                embed.insert_field_at(  index=1,
-                                                        name='Push',
-                                                        value=f'You get your bet back',
-                                                        inline=False
-                                                        )
-
-
-                            elif dealtotal > usertotal:
-                                embed.insert_field_at(  index=1,
-                                                        name='Dealer Wins!',
-                                                        value=f'You loose your money',
-                                                        inline=False)
-
-                            await channel.send(embed=embed)
-
-
-#_______    ________________________________________________________________
-
-
-            elif choice.content.lower() == 'stay':
-                usertotal = value(userc1, userc2)
-                embed.remove_field(1)
-                dealcardlen = len(dealcards)
-                if dealcardlen == 2:
-                    embed.add_field(name='Dealer Cards',
-                                value=f'{dealerc1} , {dealerc2}' ,
-                                inline=False   
-                                )
-                elif dealcardlen == 3:
-                    embed.add_field(name='Dealer Cards',
-                                value=f'{dealerc1} , {dealerc2} , {dealerc2}',
-                                inline=False    
-                                )
-                elif dealcardlen == 4:
-                    embed.add_field(name='Dealer Cards',
-                                value=f'{dealerc1} , {dealerc2} , {dealerc3} , {dealerc4}'  ,
-                                inline=False  
-                                )
-                else:
-                    print('Dealer card else')
-
-
-                #if userc1 == userc2 and usertotal > dealtotal:
-                #    #perfect pair win odds 30/1
-                #    bet = bet + (bet * 30)
-                #    embed.insert_field_at(  index=1,
-                #                            name='',
-                #                            value=f'')
-#
-                #elif usertotal == 21 and dealtotal < usertotal:
-                #    bet = bet + (bet * 1.5)
-                #    embed.insert_field_at(  index=1,
-                #                            name='',
-                #                            value=f'')
-
-                if usertotal > dealtotal:
-                    bet = bet + bet
-                    embed.insert_field_at(  index=1,
-                                            name='You win!',
-                                            value=f'Your bet back Plus 1x',
-                                            inline=False
-                                            )
-
-                elif usertotal == dealtotal:
-                    embed.insert_field_at(  index=1,
-                                            name='Push',
-                                            value=f'You get your bet back',
-                                            inline=False
-                                            )
-
-
-                elif dealtotal > usertotal:
-                    embed.insert_field_at(  index=1,
-                                            name='Dealer Wins!',
-                                            value=f'You loose your bet',
-                                            inline=False
-                                            )
+            elif nmb == 'A':
+                if counter > 2 and total <= 10 and len(cards) == 2:
+                    total += 11
                 
-                await channel.send(embed=embed)
+                elif counter == 1 and len(cards) == 2:
+                    total+=  11
+                    
+                else:
+                    total += 1
+            
+            elif nmb in [str(x) for x in range(2,11)]:
+                total += int(nmb)
+            counter += 1
+        
+        return int(total)
+
+    def valid_bet(self, ctx, bet):
+        guild = ctx.guild
+        user = ctx.author
+        with open(f'data/{guild.id}/economy.json', 'r') as f:
+            users = json.load(f)
+            for u in users['user']:
+                if str(u['id']) == str(user.id):
+                    usercoins = u['coins']
+                    if int(usercoins) > int(bet):
+                        return True, usercoins
+                    else:
+                        return False, usercoins
+
+
+    def deal(self, hand:list):
+        hand.append(random.choice(self.suits) + random.choice(self.cards))
+        hand.append(random.choice(self.suits) + random.choice(self.cards))
+        return hand
+
+    def hit(self, hand:list):
+        hand.append(random.choice(self.suits) + random.choice(self.cards))
+        return hand
+
+    def build_embed(self, dealer:list, hand:list, choice, bet):
+        total = self.value(hand)
+        embed = discord.Embed(title='Black Jack')
+        embed.add_field(name ='Your Cards',
+                        value=f'______',
+                        inline=False)
+        for card in hand:
+            embed.add_field(name=f'{card}',
+                        value='__',
+                        inline=True)
+        
+
+        
+        if choice == 'stay':
+            if self.check_win(dealer, hand) == 'win':
+                embed.add_field(name='YOU WIN!',
+                                value=f'{bet}',
+                                inline=False)
+                    
+            elif self.check_win(dealer, hand) == 'push':
+                embed.add_field(name='PUSH!',
+                                value=f'{bet}',
+                                inline=False)
+
+            elif self.check_win(dealer, hand) == 'lose':
+                embed.add_field(name='YOU LOSE!',
+                                value=f'{bet}',
+                                inline=False)
+
+            embed.add_field(name='Dealer Cards',
+                            value=f'________',
+                            inline=False)
+            
+            for card in dealer:
+                embed.add_field(name=f'{card}',
+                                value='__',
+                                inline=True)  
+
+        
+        elif choice == 'hit':
+            if total > 21:
+                embed.add_field(name='Bust!',
+                                value=f'Your total is {total}. \n{bet} ',
+                                inline=False)
+                
+                embed.add_field(name='Dealer Cards',
+                                value=f'________',
+                                inline=False)
+                
+                for card in dealer:
+                    embed.add_field(name=f'{card}',
+                                    value='__',
+                                    inline=True)  
+            else:         
+           
+                embed.add_field(name ='____________',
+                                value='hit or stay?',
+                                inline=False)
+
+                embed.add_field(name='Your Bet',
+                                value=f'{bet}',
+                                inline=False)
+
+        return embed
+
+    def check_win(self, dealer,  player):
+        playerTotal = self.value(player)
+        dealerTotal = self.value(dealer)
+        if dealerTotal > 21:
+            return 'win'
+        
+        elif playerTotal > 21:
+            return 'lose'
+        
+        elif playerTotal > dealerTotal:
+            return 'win'
+        
+        elif playerTotal == dealerTotal:
+            return 'push'
+        
+        elif  playerTotal < dealerTotal:
+            return 'lose'
+
+    
+    
+    def settle_bet(self, ctx, bet, score):
+        with open(f'data/{ctx.guild.id}/economy.json', 'r') as f:
+            f.seek(0)
+            users = json.load(f)
+            for  u in users['user']:
+                if str(ctx.author.id) == u['id']:
+                    if score == 'win':
+                        bet += bet
+                        with open(f'data/{ctx.guild.id}/economy.json', 'w') as file:
+                            u['coins'] = int(u['coins']) + bet
+                            json.dump(users,file,indent=5)
+                            f.seek(0)
+                            file.seek(0)
+                            return f'{bet} has been added to your account. \nYour new balance is {u["coins"]}'
+
+
+                    elif score == 'push':
+                        return f'{bet} has been returned to your account'
+                        
+
+                    elif score == 'lose':
+                        with open(f'data/{ctx.guild.id}/economy.json', 'w') as file:
+                            
+                            u['coins'] = int(u['coins']) - bet
+                            json.dump(users,file,indent=5)
+                            f.seek(0)
+                            file.seek(0)
+                            return f'{bet} has been removed from your account. \nYour new balance is {u["coins"]}'
+
+
+
+
+
+    @commands.command()
+    async def blackjack(self, ctx, arg:int):
+        guild   = ctx.guild
+        channel = ctx.channel
+        _user_id = ctx.author.id
+        bet = arg
+
+        valid     = self.valid_bet(ctx,arg)[0]
+        usercoins = self.valid_bet(ctx,arg)[1]
+
+        if  not valid:
+            await channel.send(f'Please place a bet that is lower than your current balance. \nYour Balance: {usercoins}')
+        
+        elif valid:
+            userhand   = self.deal([])
+            dealerhand = self.deal([])
+
+            while self.value(dealerhand) < 17:
+                dealerhand = self.hit(dealerhand)
+
+            embed = self.build_embed(dealerhand, userhand, 'hit', bet)
+        
+            await channel.send(embed=embed)
+
+            def check(msg):
+                return msg.author.id == _user_id and msg.channel == channel and msg.content.lower() in ['hit','stay']
+
+            hit = True
+            while hit:
+
+                try:
+                    choice = await self.bot.wait_for('message', check=check, timeout = 60.00)
+                    if choice.content.lower() == 'stay':
+                        score = self.check_win(dealerhand, userhand)
+                        bet = self.settle_bet(ctx, bet, score)
+                        embed = self.build_embed(dealerhand, userhand, 'stay', bet)
+                        hit = False
+                        await channel.send(embed=embed)
+
+                    elif choice.content.lower() == 'hit':
+                        userhand = self.hit(userhand)
+                        if self.value(userhand) > 21:
+                            hit = False
+                            bet = self.settle_bet(ctx, bet, 'lose')
+                        embed = self.build_embed(dealerhand, userhand, 'hit', bet)
+                        await channel.send(embed=embed)
+
+
+                except TimeoutError:
+                    await channel.send('Command Timed Out')
 
 
 
