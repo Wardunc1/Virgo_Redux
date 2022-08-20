@@ -66,7 +66,7 @@ class Economy(commands.Cog):
         now = str(now).split('.')[0]
         with open(f'data/{guild.id}/economy.json', 'r') as d:
             users = json.load(d)
-            print('doc opened',now)
+            print('doc opened')
             counter = 0
             for u in users['user']:
                 if str(user.id) == u['id']:  
