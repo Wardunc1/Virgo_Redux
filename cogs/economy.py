@@ -136,16 +136,16 @@ class Economy(commands.Cog):
             with open(f'data/{guild.id}/economy.json', 'r') as file:
                 file.seek(0)
                 users = json.load(file)
-
+                counter = 0
                 for u in users['user']:
                     if u['name'].lower() == arg[0].lower():
                         coins = u['coins']
                         uname = u['name']
                         lastwork = time.localtime(int(u['lastwork']))
-                        await channel.send(f'{uname} has {coins} coins and last worked on {lastwork}')
+                        await channel.send(f'{uname} has {coins} coins and last worked on {time.asctime(lastwork)}')
 
                         print('user found')
-                    else:
+                    elif counter == len(users):
                         await channel.send('User not found.')  
                 file.seek(0)     
     
