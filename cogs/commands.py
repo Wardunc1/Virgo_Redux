@@ -70,6 +70,11 @@ yes    yes  yes yes yes
 
         await msg.channel.send(file = img)
 
+    @commands.command()
+    async def mlg(self, msg):
+        img = discord.File('assets/ddf-mlg.gif')
+        await msg.channel.send(file = img)
+
 
     @commands.command()
     async def selfhelp(self, msg):
