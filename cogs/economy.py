@@ -107,12 +107,12 @@ class Economy(commands.Cog):
                     
 
     @commands.command()
-    async def wallet(self, ctx, *arg):
+    async def wallet(self, ctx, *username):
 
         user = ctx.author
         channel = ctx.channel
         guild = ctx.guild
-        if arg == ():
+        if username == ():
             with open(f'data/{guild.id}/economy.json', 'r') as f:
                 f.seek(0)
                 users = json.load(f)
@@ -128,7 +128,7 @@ class Economy(commands.Cog):
 
 
             print('no args')
-        elif len(arg) > 1:
+        elif len(username) > 1:
             await channel.send('Please enter one name')
 
         else:
@@ -138,7 +138,7 @@ class Economy(commands.Cog):
                 users = json.load(file)
                 counter = 0
                 for u in users['user']:
-                    if u['name'].lower() == arg[0].lower():
+                    if u['name'].lower() == username[0].lower():
                         coins = u['coins']
                         uname = u['name']
                         lastwork = time.localtime(int(u['lastwork']))
@@ -183,8 +183,13 @@ class Economy(commands.Cog):
             for u in users['user']:
                 if str(u['id']) == str(user.id):
                     usercoins = u['coins']
-                    if int(usercoins) > int(bet):
+
+                    if int(bet) < 0:
+                        return False, usercoins
+                        
+                    elif int(usercoins) > int(bet):
                         return True, usercoins
+
                     else:
                         return False, usercoins
 
@@ -327,7 +332,7 @@ class Economy(commands.Cog):
         usercoins = self.valid_bet(ctx,arg)[1]
 
         if  not valid:
-            await channel.send(f'Please place a bet that is lower than your current balance. \nYour Balance: {usercoins}')
+            await channel.send(f'Please place a valid bet. \nYour Balance: {usercoins}')
         
         elif valid:
             userhand   = self.deal([])
