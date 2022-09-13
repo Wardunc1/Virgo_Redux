@@ -14,9 +14,9 @@ intents.presences = True
 intents.messages  = True
 
 class Virgo_Bot(commands.Bot):
-    def __init__(self, command_prefix='!',self_bot=False,*args,**kwargs):
+    def __init__(self, command_prefix='!',self_bot=False, intents=intents, *args,**kwargs):
             
-        super().__init__(command_prefix='!', *args, **kwargs)
+        super().__init__(command_prefix='!',intents= intents, *args, **kwargs)
 
     async def on_ready(self):
         print('Loading Cogs')
